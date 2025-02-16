@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {% block main %}
+<div>
+	<div class="image-div">
+		<img
+			class="card-img"
+			src="{{ url_for('static', filename='images/logo.jpeg') }}"
+			alt="logo"
+		/>
+	</div>
+	<form action="{{ url_for('auth.register') }}" method="post">
+		{{ form.csrf_token }}
+		<div class="form-group">
+			{{ form.firstname(class="form-control") }}
+			{{ form.lastname(class="form-control") }}
+		</div>
+		<div class="form-group">
+			{{ form.email(class="form-control") }}
+			{{ form.phone_number(class="form-control") }}
+		</div>
+		<div class="form-group">
+			{{ form.password(class="form-control") }}
+			{{ form.confirm_password(class="form-control") }}
+		</div>
+		<div class="form-group">
+			{{ form.birthdate(class="form-control") }}
+		</div>
+		<div class="button-div">
+			{{ form.submit(class="btn btn-light") }}
+			<h7>
+				Already have an account?
+				<a href="/auth/login"> Login </a>
+			</h7>
+		</div>
+	</form>
+</div>
+{% endblock %}

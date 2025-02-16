@@ -1,0 +1,26 @@
+{% extends 'base.html' %} {% block main %}
+<div>
+	<div class="image-div">
+		<img
+			src="{{ url_for('static', filename='images/logo.jpeg') }}"
+			alt="logo"
+		/>
+	</div>
+	<form action="{{ url_for('auth.login') }}" method="post">
+		{{ form.csrf_token }}
+		<div class="form-group">
+			{{ form.email_or_phone(class="form-control") }}
+		</div>
+		<div class="form-group">
+			{{ form.password(class="form-control") }}
+		</div>
+		<div class="button-div">
+			{{ form.submit(class="btn btn-light") }}
+			<h7 style="margin-top: 10px">
+				Don't you have an account yet?
+				<a href="/auth/register"> Register </a>
+			</h7>
+		</div>
+	</form>
+</div>
+{% endblock %}
