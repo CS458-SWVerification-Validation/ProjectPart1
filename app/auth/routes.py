@@ -28,7 +28,6 @@ def login():
             user = User.query.filter_by(email=form.email_or_phone.data).first()
         elif is_phone_number(form.email_or_phone.data):
             user = User.query.filter_by(phone_number=form.email_or_phone.data).first()
-        print(user)
         
         if user and user.check_password(password):
             online_user = OnlineUser.query.filter_by(user_id=user.id).first()
