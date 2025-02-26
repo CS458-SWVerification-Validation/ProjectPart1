@@ -15,12 +15,15 @@
 			{{ form.password(class="form-control") }}
 		</div>
 		<div class="button-div">
-			{{ form.submit(class="btn btn-light") }}
-			<h7 style="margin-top: 10px">
-				Don't you have an account yet?
-				<a href="/auth/register"> Register </a>
-			</h7>
+			{{ form.submit(class="btn btn-primary") }}
 		</div>
 	</form>
+	<div class="button-div">
+		<a class="btn btn-secondary" href="/oauth">Google Sign-in</a>
+		<h7 style="margin-top: 10px">
+			Don't you have an account yet?
+			<a href="/auth/register"> Register </a>
+		</h7>
+	</div>
 </div>
 {% endblock %}
