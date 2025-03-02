@@ -64,7 +64,9 @@ def register():
             if user:
                 flash('Email already registered!', "error")
             else:
-                db.session.add(User(birthdate=form.birthdate.data, phone_number=form.phone_number.data, firstname=form.firstname.data, lastname=form.lastname.data, email=form.email.data, password=form.password.data))
+                db.session.add(User(birthdate=form.birthdate.data, phone_number=form.phone_number.data, 
+                                    firstname=form.firstname.data, lastname=form.lastname.data, email=form.email.data,
+                                    password=form.password.data))
                 db.session.commit()
 
                 flash('Registered Successfully!', "success")

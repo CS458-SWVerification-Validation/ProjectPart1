@@ -116,7 +116,8 @@ def create_app(config_mode='development'):
                 else:
                     flash('Invalid Credentials!', "error")
             else:
-                db.session.add(User(birthdate=datetime.now(), phone_number="", firstname=users_firstname, lastname=users_lastname, email=users_email, password=unique_id))
+                db.session.add(User(birthdate=datetime.now(), phone_number="", firstname=users_firstname, lastname=users_lastname,
+                                    email=users_email, password=unique_id))
                 db.session.commit()
 
                 user = User.query.filter_by(email=users_email).first()
