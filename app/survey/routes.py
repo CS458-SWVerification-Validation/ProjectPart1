@@ -1,32 +1,45 @@
-from flask import request, jsonify, flash, redirect, url_for, render_template, render_template_string
+from flask import request, jsonify, flash, redirect
 from flask_login import login_user, login_required, logout_user, current_user
+import json
 
 from app.survey import bp
 from app.extensions import db
 from app.models.user import User, OnlineUser
 from app.models.survey import Survey
-from app.survey.forms import SurveyForm
+from app.mail import send_email
 
 final_uri = "myapp://home"
 
 @bp.route("/submit/<user_id>", methods=["POST"])
 def submit_survey(user_id):
-    user = User.query.filter(user_id).first_or_404()
-    if user: 
+    user = User.query.filter_by(id=user_id).first_or_404()
+    if user:
+        data = request.get_json()
         survey = Survey(
             user_id=user_id,
-            name=request.get('name'),
-            surname=request.get('surname'),
-            birth_date=request.get('birthDate'),  # convert string to date if needed
-            education_level=request.get('educationLevel'),
-            city=request.get('city'),
-            gender=request.get('gender'),
-            ai_models=request.get('aiModels'),
-            defects=request.get('defects'),
-            use_case=request.get('useCase')
+            name=data.get('name'),
+            surname=data.get('surname'),
+            birth_date=data.get('birthDate'),  # convert string to date if needed
+            education_level=data.get('educationLevel'),
+            city=data.get('city'),
+            gender=data.get('gender'),
+            models_and_defects=json.dumps(data.get('defects')),
+            use_case=data.get('useCase')
         )
         db.session.add(survey)
+        if user.email:
+            send_email("About Survey", 
+                    f"Your survey submitted successfully!\n\nName: {survey.name}\nSurname: {survey.surname}\nBirthdate: {survey.birth_date}\nCity: {survey.city}\nEducation Level: {survey.education_level}\nGender: {survey.gender}\nModels&Defects: {survey.models_and_defects}\n Use Cases: {survey.use_case}", 
+                    user.email)
+        
+        online_user = OnlineUser.query.filter_by(user_id=user_id).first()
+
+        if online_user:
+            db.session.delete(online_user)
+            logout_user(user)
+            print("Logout successfull")
         db.session.commit()
+        db.session.close()
         return jsonify({'message': 'Survey submitted successfully'}), 200
     else:
         return jsonify({'message': 'User does not exist'}), 200

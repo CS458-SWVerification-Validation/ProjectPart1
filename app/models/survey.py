@@ -13,8 +13,7 @@ class Survey(db.Model):
     city = db.Column(db.String(100), nullable=True)
     gender = db.Column(db.String(20), nullable=True)
 
-    ai_models = db.Column(db.String, nullable=True)     # List of selected AI models
-    defects = db.Column(db.String, nullable=True)       # Dict of model -> defect text
+    models_and_defects = db.Column(db.String, nullable=True)       # Dict of model -> defect text
     use_case = db.Column(db.String, nullable=True)
 
     created_at = db.Column(db.DateTime, server_default=db.func.now())
