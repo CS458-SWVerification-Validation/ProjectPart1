@@ -1,5 +1,6 @@
 from flask import request, jsonify, flash, redirect
 from flask_login import login_user, login_required, logout_user, current_user
+from dateutil.parser import isoparse
 import json
 
 from app.survey import bp
@@ -19,7 +20,7 @@ def submit_survey(user_id):
             user_id=user_id,
             name=data.get('name'),
             surname=data.get('surname'),
-            birth_date=data.get('birthDate'),  # convert string to date if needed
+            birth_date=isoparse(data.get('birthDate')),
             education_level=data.get('educationLevel'),
             city=data.get('city'),
             gender=data.get('gender'),
@@ -36,7 +37,7 @@ def submit_survey(user_id):
 
         if online_user:
             db.session.delete(online_user)
-            logout_user(user)
+            logout_user()
             print("Logout successfull")
         db.session.commit()
         db.session.close()
