@@ -45,6 +45,9 @@ def create_app(config_mode='development'):
 
     from app.user import bp as user_bp
     app.register_blueprint(user_bp, url_prefix='/user')
+
+    from app.survey import bp as survey_bp
+    app.register_blueprint(survey_bp, url_prefix='/survey')
     
     @app.route('/')
     def splash():

@@ -1,15 +1,20 @@
-from flask import request, jsonify, flash, redirect, url_for, render_template
+from flask import request, jsonify, flash, redirect, url_for, render_template, render_template_string
 from flask_login import login_user, login_required, logout_user, current_user
-import re
 from email_validator import validate_email, EmailNotValidError
 from hashlib import sha256
 from datetime import datetime, timedelta
+from user_agents import parse
+import re
+import jwt
 
 from config import Config
 from app.auth import bp
 from app.extensions import db
 from app.models.user import User, OnlineUser
 from app.auth.forms import LoginForm, RegisterForm
+
+redirect_path = "/auth/callback"
+final_uri = "myapp://auth"
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -44,15 +49,44 @@ def login():
                     db.session.commit()
                     flash('Logged in Successfully!', "success")
                     login_user(user)
-                    return redirect(url_for("user.dashboard"))
+                    # Check if mobile or pc
+                    ua_string = request.headers.get("User-Agent")
+                    user_agent = parse(ua_string)
+                    if user_agent.is_mobile:
+                        print("Mobile Device")
+                        token = jwt.encode({"user_id": user.id}, "secret_key", algorithm="HS256")
+                        return redirect(f"/auth/callback?token={token}&final_uri={final_uri}")
+                    elif user_agent.is_pc:
+                        print("PC User")
+                        return redirect(url_for("user.dashboard"))
                 else:
                     flash('IP Already Online!', "error")  
             else:
                 flash('Already Logged In!', "error")
         else:
             flash('Invalid Credentials!', "error")
-            
+
     return render_template('auth/login.html', form=form), 200
+
+@bp.route("/callback")
+def callback():
+    token = request.args.get("token")
+    final_uri = request.args.get("final_uri")
+    print(token, final_uri)
+    return render_template_string(f"""
+        <html>
+        <head><title>Redirecting...</title></head>
+        <body>
+            <p>Login successful. Redirecting to app...</p>
+            <script>
+                setTimeout(function() {{
+                    console.log("It is redirecting!!!")
+                    window.location.href = "{final_uri}?token={token}";
+                }}, 100);
+            </script>
+        </body>
+        </html>
+    """)
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
