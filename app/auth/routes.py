@@ -10,7 +10,7 @@ import jwt
 from config import Config
 from app.auth import bp
 from app.extensions import db
-from app.models.user import User, OnlineUser
+from app.models.user import User
 from app.auth.forms import LoginForm, RegisterForm
 
 redirect_path = "/auth/callback"
@@ -19,13 +19,6 @@ final_uri = "myapp://auth"
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
-
-    if current_user.is_authenticated:
-        ipaddress = request.headers.get('X-Forwarded-For', request.headers.get('X-Real-IP', request.remote_addr))
-        online_ip = OnlineUser.query.filter_by(ipaddress=ipaddress).first()
-        online_user = OnlineUser.query.filter_by(user_id=current_user.id).first()
-        if online_user:
-            return redirect(url_for("user.dashboard"))
 
     if request.method == 'POST' and form.validate_on_submit(): #validation check
         password = form.password.data
@@ -38,31 +31,18 @@ def login():
             return render_template('auth/login.html', form=form), 200
         
         if user and user.check_password(password):
-            online_user = OnlineUser.query.filter_by(user_id=user.id).first()
-            
-            if not online_user:
-                ipaddress = request.headers.get('X-Forwarded-For', request.headers.get('X-Real-IP', request.remote_addr))
-                online_ip = OnlineUser.query.filter_by(ipaddress=ipaddress).first()
-        
-                if not online_ip:            
-                    db.session.add(OnlineUser(user_id=user.id, ipaddress=ipaddress, logindatetime=datetime.utcnow()))
-                    db.session.commit()
-                    flash('Logged in Successfully!', "success")
-                    login_user(user)
-                    # Check if mobile or pc
-                    ua_string = request.headers.get("User-Agent")
-                    user_agent = parse(ua_string)
-                    if user_agent.is_mobile:
-                        print("Mobile Device")
-                        token = jwt.encode({"user_id": user.id}, "secret_key", algorithm="HS256")
-                        return redirect(f"/auth/callback?token={token}&final_uri={final_uri}")
-                    elif user_agent.is_pc:
-                        print("PC User")
-                        return redirect(url_for("user.dashboard"))
-                else:
-                    flash('IP Already Online!', "error")  
-            else:
-                flash('Already Logged In!', "error")
+            flash('Logged in Successfully!', "success")
+            login_user(user)
+            # Check if mobile or pc
+            ua_string = request.headers.get("User-Agent")
+            user_agent = parse(ua_string)
+            if user_agent.is_mobile:
+                print("Mobile Device")
+                token = jwt.encode({"user_id": user.id}, "secret_key", algorithm="HS256")
+                return redirect(f"/auth/callback?token={token}&final_uri={final_uri}")
+            elif user_agent.is_pc:
+                print("PC User")
+                return redirect(url_for("user.dashboard"))
         else:
             flash('Invalid Credentials!', "error")
 
@@ -113,12 +93,9 @@ def register():
 @bp.route("/logout", methods=["GET"])
 @login_required
 def logout():
-    user = OnlineUser.query.filter_by(user_id=current_user.id).first()
 
-    if user:
+    if current_user.is_authenticated:
         flash('Successfully Logged Out!', "success")
-        db.session.delete(user)
-        db.session.commit()
         logout_user()
         return redirect("/auth/login")
 

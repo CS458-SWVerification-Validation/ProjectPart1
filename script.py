@@ -1,4 +1,4 @@
-from app.models.user import User, OnlineUser
+from app.models.user import User
 from app.extensions import db
 from datetime import datetime, time
 

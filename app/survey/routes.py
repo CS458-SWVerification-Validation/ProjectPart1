@@ -1,10 +1,10 @@
 from flask import request, jsonify
-from flask_login import logout_user
+from flask_login import logout_user, current_user
 import json
 
 from app.survey import bp
 from app.extensions import db
-from app.models.user import User, OnlineUser
+from app.models.user import User
 from app.models.survey import Survey
 from app.mail import send_email
 
@@ -31,11 +31,8 @@ def submit_survey(user_id):
             send_email("About Survey", 
                     f"Your survey submitted successfully!\n\nName: {survey.name}\nSurname: {survey.surname}\nBirthdate: {survey.birth_date}\nCity: {survey.city}\nEducation Level: {survey.education_level}\nGender: {survey.gender}\nModels&Defects: {survey.models_and_defects}\n Use Cases: {survey.use_case}", 
                     user.email)
-        
-        online_user = OnlineUser.query.filter_by(user_id=user_id).first()
 
-        if online_user:
-            db.session.delete(online_user)
+        if current_user.is_authenticated:
             logout_user()
             print("Logout successfull")
         db.session.commit()

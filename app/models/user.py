@@ -33,19 +33,3 @@ class User(UserMixin, db.Model):
 
 	def getUserByEmail(email):
 		return User.query.filter_by(email=email).first()
-
-class OnlineUser(db.Model):
-	__tablename__ = 'OnlineUsers'
-
-	id = db.Column(db.Integer, primary_key=True)
-	user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-	ipaddress = db.Column(db.String(128), unique=True, nullable=False)
-	logindatetime = db.Column(db.DateTime, nullable=False)
-
-	user = db.relationship('User', backref='online_users')
-
-	def getUserByEmail(email):
-		return OnlineUser.query.filter_by(email=email).first()
-
-	def getUserByIpAddress(ipaddress):
-		return OnlineUser.query.filter_by(ipaddress=ipaddress).first()

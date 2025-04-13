@@ -10,7 +10,7 @@ import requests
 from dotenv import load_dotenv
 from config import config
 from app.extensions import db
-from app.models.user import User, OnlineUser
+from app.models.user import User
 from datetime import datetime
 
 load_dotenv()
@@ -100,22 +100,9 @@ def create_app(config_mode='development'):
             user = User.query.filter_by(email=users_email).first()
             if user:
                 if user.check_password(unique_id):
-                    online_user = OnlineUser.query.filter_by(user_id=user.id).first()
-            
-                    if not online_user:
-                        ipaddress = request.headers.get('X-Forwarded-For', request.headers.get('X-Real-IP', request.remote_addr))
-                        online_ip = OnlineUser.query.filter_by(ipaddress=ipaddress).first()
-                
-                        if not online_ip:            
-                            db.session.add(OnlineUser(user_id=user.id, ipaddress=ipaddress, logindatetime=datetime.utcnow()))
-                            db.session.commit()
-                            flash('Logged in Successfully!', "success")
-                            login_user(user)
-                            return redirect(url_for("user.dashboard"))
-                        else:
-                            flash('IP Already Online!', "error")  
-                    else:
-                        flash('Already Logged In!', "error")
+                    flash('Logged in Successfully!', "success")
+                    login_user(user)
+                    return redirect(url_for("user.dashboard"))
                 else:
                     flash('Invalid Credentials!', "error")
             else:
@@ -125,22 +112,9 @@ def create_app(config_mode='development'):
 
                 user = User.query.filter_by(email=users_email).first()
                 if user:
-                    online_user = OnlineUser.query.filter_by(user_id=user.id).first()
-            
-                    if not online_user:
-                        ipaddress = request.headers.get('X-Forwarded-For', request.headers.get('X-Real-IP', request.remote_addr))
-                        online_ip = OnlineUser.query.filter_by(ipaddress=ipaddress).first()
-                
-                        if not online_ip:            
-                            db.session.add(OnlineUser(user_id=user.id, ipaddress=ipaddress, logindatetime=datetime.utcnow()))
-                            db.session.commit()
-                            flash('Registered and Logged In Successfully!', "success")
-                            login_user(user)
-                            return redirect(url_for("user.dashboard"))
-                        else:
-                            flash('IP Already Online!', "error")  
-                    else:
-                        flash('Already Logged In!', "error")
+                    flash('Registered and Logged In Successfully!', "success")
+                    login_user(user)
+                    return redirect(url_for("user.dashboard"))
                 else:
                     flash('Already Logged In!', "error")
                     return redirect(url_for("auth.login"))
