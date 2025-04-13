@@ -1,6 +1,5 @@
-from flask import request, jsonify, flash, redirect
-from flask_login import login_user, login_required, logout_user, current_user
-from dateutil.parser import isoparse
+from flask import request, jsonify
+from flask_login import logout_user
 import json
 
 from app.survey import bp
@@ -20,7 +19,7 @@ def submit_survey(user_id):
             user_id=user_id,
             name=data.get('name'),
             surname=data.get('surname'),
-            birth_date=isoparse(data.get('birthDate')),
+            birth_date=data.get('birthDate'),
             education_level=data.get('educationLevel'),
             city=data.get('city'),
             gender=data.get('gender'),

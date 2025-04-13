@@ -8,7 +8,7 @@ class Survey(db.Model):
 
     name = db.Column(db.String(100), nullable=False)
     surname = db.Column(db.String(100), nullable=False)
-    birth_date = db.Column(db.Date, nullable=True)
+    birth_date = db.Column(db.String(10), nullable=True)
     education_level = db.Column(db.String(50), nullable=True)
     city = db.Column(db.String(100), nullable=True)
     gender = db.Column(db.String(20), nullable=True)
