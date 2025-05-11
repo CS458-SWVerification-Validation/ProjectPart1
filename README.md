@@ -74,4 +74,4 @@ This command is used to run the code on the development environment.
 python app.py
 ```
 
-Now the Flask application would run on [http://127.0.0.1:8003](http://127.0.0.1:8003)
+Now the Flask application would run on [http://127.0.0.1:5000](http://127.0.0.1:5000)
